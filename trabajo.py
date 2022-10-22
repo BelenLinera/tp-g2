@@ -8,13 +8,13 @@ class ProgramaPrincipal:
             print("0- Salir de menu")
             print("1- Cargar Monopatines")
             print("2- Modificar Monopatin")
-            print("3 Borrar Monopatin")
-            print("4 Cargar disponibilidad")
-            print("5 Listado de productos")
-            print("6 Crear tabla con nuevos atributos")
-            print("7 Actualizar precios por el aumento del dolar")
-            print("8 Mostrar registros anteriores a una fecha especifica")
-            nro = int(input("Por favor ingrese un número"))
+            print("3- Borrar Monopatin")
+            print("4- Cargar disponibilidad")
+            print("5- Listado de productos")
+            print("6- Crear tabla con nuevos atributos")
+            print("7- Actualizar precios por el aumento del dolar")
+            print("8- Mostrar registros anteriores a una fecha especifica")
+            nro = int(input("Por favor ingrese un número: "))
             if nro == 1:
                 id_usuario = 0
                 marca = input("Por favor ingrese la marca del monopatin: ")
@@ -27,17 +27,18 @@ class ProgramaPrincipal:
                 nuevo_monopatin.cantidadDisponibles=cantidadDisponibles
                 nuevo_monopatin.cargar_monopatin()
             if nro ==2:
-                id_usuario = input("Por favor ingrese el codigo del monopatin a modificar: ")
+                marca = input("Por favor ingrese la marca del monopatin a modificar: ")
                 precio = input("Por favor ingrese el nuevo precio: ")
                 monopatin_a_modificar = Monopatin()
-                monopatin_a_modificar.id_usuario=id_usuario
+                monopatin_a_modificar.marca = marca
                 monopatin_a_modificar.precio=precio
                 monopatin_a_modificar.modificar_monopatines()
             if nro ==3:
-                id_usuario = input("Por favor ingrese el codigo del monopatin a eliminar: ")
-                monopatin_a_eliminiar = Monopatin()
-                monopatin_a_eliminiar.id_usuario=id_usuario
-                monopatin_a_eliminiar.eliminar_monopatin()
+                #no funciona el borrar
+                id_usuario = input("ingrese el id del monopatin a eliminar: ")    
+                monopatin_a_eliminar = Monopatin()
+                monopatin_a_eliminar.id_usuario = id_usuario          
+                monopatin_a_eliminar.eliminar_monopatin()
             if nro ==4:
                 marca = input("Por favor ingrese la marca del monopatin: ")
                 sumar_disponibilidad =Monopatin()
@@ -72,22 +73,22 @@ class ProgramaPrincipal:
         conexion = Conexiones()
         conexion.abrirConexion() #ESTO
         conexion.miCursor.execute("DROP TABLE IF EXISTS MONOPATINES")
-        conexion.miCursor.execute("CREATE TABLE MONOPATIN (id_usuario INTEGER PRIMARY KEY AUTOINCREMENT, marca  VARCHAR(30) ,precio FLOAT NOT NULL, cantidadDisponibles INTEGER NOT NULL, UNIQUE(marca))")    
+        conexion.miCursor.execute("CREATE TABLE MONOPATINES (id_usuario INTEGER PRIMARY KEY AUTOINCREMENT, marca  VARCHAR(30) ,precio FLOAT NOT NULL, cantidadDisponibles INTEGER NOT NULL, UNIQUE(marca))")    
         conexion.miConexion.commit()  #ESTO     
         conexion.cerrarConexion() # ESTO SIEMPRE LO MISMO
 
-class Monopatin():
-    def __init__(self,marca,precio,cantidadDisponibles):
-        #self.id_usuario = id_usuario
-        self.marca = str(marca)
-        self.precio = float(precio)
+class Monopatin:
+    def init(self, id_usuario, marca,precio,cantidadDisponibles):
+        self.id_usuario = id_usuario
+        self.marca = marca
+        self.precio = precio
         self.cantidadDisponibles = cantidadDisponibles
         
     def cargar_monopatin(self):
         conexion = Conexiones()
         conexion.abrirConexion()
         try:
-            conexion.miCursor.execute("INSERT INTO MONOPATINES(id_usuario,marca,precio,cantidadDisponibles) VALUES('{}','{}','{}','{}')".format(self.id_usuario, self.marca, self.precio,self.cantidadDisponibles))
+            conexion.miCursor.execute("INSERT INTO MONOPATINES(marca,precio,cantidadDisponibles) VALUES('{}','{}','{}')".format(self.marca, self.precio,self.cantidadDisponibles))
             conexion.miConexion.commit()
             print("Monopatin cargado exitosamente")
         except:
@@ -100,7 +101,7 @@ class Monopatin():
         conexion = Conexiones()
         conexion.abrirConexion()
         try:
-            conexion.miCursor.execute("UPDATE MONOPATINES SET precio='{}' where id_usuario='{}' ".format(self.precio,self.id_usuario))
+            conexion.miCursor.execute("UPDATE MONOPATINES SET precio='{}' where marca='{}' ".format(self.precio, self.marca))
             conexion.miConexion.commit()
             print("Monopatin modificado correctamente")
         except:
@@ -112,19 +113,21 @@ class Monopatin():
         conexion = Conexiones()
         conexion.abrirConexion()
         try: 
-            conexion.miCursor.execute("DELETE MONOPATINES(id_usuario,marca,precio,cantidadDisponibles) VALUES('{}','{}','{}','{}')".format(self.id_usuario, self.marca, self.precio,self.cantidadDisponibles))
+            #esta mal, no lo borra
+            #conexion.miCursor.execute("DELETE MONOPATINES(id_usuario,marca,precio,cantidadDisponibles) VALUES('{}','{}','{}','{}')".format(self.id_usuario, self.marca, self.precio,self.cantidadDisponibles))
+            conexion.miCursor.execute("DELETE MONOPATINES VALUES ('{}','{}','{}','{}')".format(self.id_usuario, self.marca, self.precio,self.cantidadDisponibles))
             conexion.miConexion.commit()
         except:
             print("Error, no se encontro el id")
         finally:
-            conexion.cerrarConexion()
+            conexion.cerrarConexion()    
+        
         
 
     def cargar_disponibilidad(self):
         conexion = Conexiones()
         conexion.abrirConexion()
         try:
-            #esta bien poner asi lo de cant disp. Y si hay que agregar self.cant disp
             conexion.miCursor.execute ("UPDATE MONOPATINES SET cantidadDisponibles = cantidadDisponibles + 1 where marca='{}'".format(self.marca))
             conexion.miConexion.commit()
             print("Cantidad disponible")
@@ -140,20 +143,15 @@ class Monopatin():
         try:
             conexion.miCursor.execute("SELECT * FROM MONOPATINES")
             conexion.miConexion.commit()
+            print("id_usuario, marca, precio, cantidadDisponible")
             for Row in conexion.miCursor.execute("SELECT * FROM MONOPATINES"):
-                print(Row) ##preguntar para guardarlo en una tabla si es con dos for o si es lo de abajo o sin lo de abajo
-            '''for self.id_usuario in Monopatines():
-                print(self.id_usuario)
-                print(self.marca)
-                print(self.precio)
-                print(self.cantidadDisponibles)
-                ##creemos que solo usando el select from funciona lo de mostrar la tabla de manera ordenada por id'''
+                print(Row) 
             
         finally:
             conexion.cerrarConexion()
 
-class Monopatin2():
-    def __init__(self,id_mono, modelo, marca, potencia, precio, color, fechaUltimoPrecio):
+class Monopatin2:
+    def init(self,id_mono, modelo, marca, potencia, precio, color, fechaUltimoPrecio):
         self.id_mono = id_mono
         self.modelo = modelo
         self.marca = marca
@@ -234,7 +232,7 @@ class Monopatin2():
 
 class Conexiones:
     def abrirConexion(self):
-        self.miConexion = sqlite3.connect("STORE.db")
+        self.miConexion = sqlite3.connect("monopatines.db")
         self.miCursor = self.miConexion.cursor()  
     def cerrarConexion(self):
         self.miConexion.close()   
