@@ -47,26 +47,20 @@ class ProgramaPrincipal:
                 lista_ordenada.mostrar_productos()
             if nro ==6:
 
-                """import datetime  
-                        birthday=input("What is your B'day? (in DD/MM/YYYY) ")  
-                        birthdate=datetime.datetime.strptime(birthday,"%d/%m/%Y").date()  
-                        print("Your B'day is : "+birthdate.strftime('%d/%B/%Y'))"""
                 modelo= input("Por favor ingrese el modelo del monopatin: ")
                 marca = input("Por favor ingrese la marca del monopatin: ")
                 potencia = input("Por favor ingrese la potencia del monopatin: ")
                 precio = float(input("Por favor ingrese el precio del monopatin: "))
                 color = input("Por favor ingrese el color del monopatin: ")
-                birthday=input("What is your B'day? (in DD/MM/YYYY) ")  
-                birthdate=datetime.datetime.strptime(birthday,"%d/%m/%Y").date() 
-                #fechaUltimoPrecio = input("Por favor ingrese la fecha del ultimo precio: (DD/MM/YYYY)")
-                #fechaUltimoPrecio=datetime.datetime.strptime(fechaUltimoPrecio, "%d/%m/%Y").date()
+                fechaUltimoPrecio = input("Por favor ingrese la fecha del ultimo precio: (DD/MM/YYYY)")
+                fecha=datetime.datetime.strptime(fechaUltimoPrecio, "%d/%m/%Y").date()
                 nuevo_monopatin2 = Monopatin2()
                 nuevo_monopatin2.modelo=modelo
                 nuevo_monopatin2.marca=marca
                 nuevo_monopatin2.potencia=potencia
                 nuevo_monopatin2.precio=precio
                 nuevo_monopatin2.color=color
-                nuevo_monopatin2.fechaUltimoPrecio=birthdate
+                nuevo_monopatin2.fechaUltimoPrecio=fecha
                 nuevo_monopatin2.cargar_monopatin2()
             if nro==7:
                 fechaUltimoPrecio = input("Por favor ingrese la fecha de hoy: ")
@@ -167,7 +161,7 @@ def eliminar_monopatin(id_usuario):
             conexion.cerrarConexion()
 
 class Monopatin2:
-    def init(self, modelo, marca, potencia, color, precio, fechaUltimoPrecio):
+    def init(self,modelo,marca,potencia,precio,color,fechaUltimoPrecio):
         self.modelo = modelo
         self.marca = marca
         self.potencia = potencia
@@ -175,19 +169,18 @@ class Monopatin2:
         self.color = color
         self.fechaUltimoPrecio=fechaUltimoPrecio
 
-    
-
     def cargar_monopatin2(self):
         conexion = Conexiones()
         conexion.abrirConexion()
-        try: 
-            conexion.miCursor.execute("INSERT INTO MONOPATINES2(modelo,marca,potencia,precio,color,fechaUltimoPrecio) values('{}','{}','{}','{}','{}','{}'".format(self.modelo,self.marca,self.potencia, self.precio,self.color,self.fechaUltimoPrecio)) 
+        try:
+            conexion.miCursor.execute("INSERT INTO MONOPATINES2 (modelo,marca,potencia,precio,color,fehaUltimoPrecio) VALUES('{}','{}','{}','{}','{}','{}')".format(self.modelo, self.marca, self.potencia, self.precio, self.color, self.fechaUltimoPrecio))
             conexion.miConexion.commit()
-            print("Monopatines cargado con exito")
+            print("Monopatin cargado exitosamente")
+            
         except:
-            print("Error al cargar Monopatin")  
+            print("Error al agregar un monopatin")
         finally:
-            conexion.cerrarConexion() 
+            conexion.cerrarConexion()
 
     def crearTablaHistoricoPrecio(self):
         conexion = Conexiones() 
@@ -202,7 +195,7 @@ class Monopatin2:
         conexion = Conexiones() 
         conexion.abrirConexion() 
         conexion.miCursor.execute("DROP TABLE IF EXISTS MONOPATINES2")
-        conexion.miCursor.execute("CREATE TABLE HISTORICO_MONO (id_mono INTEGER PRIMARY KEY AUTOINCREMENT, modelo  VARCHAR(30), marca VARCHAR(30), potencia VARCHAR(30), precio INTEGER,color VARCHAR(30),fechaUltimoPrecio DATETIME")  
+        conexion.miCursor.execute("CREATE TABLE HISTORICO_MONO (id_mono INTEGER PRIMARY KEY AUTOINCREMENT, modelo VARCHAR(30), marca VARCHAR(30), potencia VARCHAR(30), precio INTEGER, color VARCHAR(30),fechaUltimoPrecio DATETIME")  
         conexion.miCursor.execute("INSERT INTO HISTORICO_MONO(id_mono,modelo,marca,potencia,precio,color,fechaUltimoPrecio) SELECT  id_mono,modelo,marca,potencia,precio,color,fechaUltimoPrecio where MONOPATINES2")
         conexion.miConexion.commit() 
         conexion.cerrarConexion()
@@ -239,7 +232,7 @@ class Monopatin2:
 
 class Conexiones:
     def abrirConexion(self):
-        self.miConexion = sqlite3.connect("monopatines.db")
+        self.miConexion = sqlite3.connect("monopatiness.db")
         self.miCursor = self.miConexion.cursor()  
     def cerrarConexion(self):
         self.miConexion.close()   
