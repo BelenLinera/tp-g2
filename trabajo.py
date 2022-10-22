@@ -55,11 +55,11 @@ class ProgramaPrincipal:
                 nuevo_monopatin2.potencia=potencia
                 nuevo_monopatin2.fechaUltimoPrecio=fechaUltimoPrecio
                 nuevo_monopatin2.cargar_monopatin2()
-            if nro==7:
+            """if nro==7:
                 fechaUltimoPrecio = input("Por favor ingrese la fecha de hoy: ")
                 precio_actualizado=Monopatin2()
                 precio_actualizado.fechaUltimoPrecio= fechaUltimoPrecio
-                precio_actualizado=actualizar_precio()
+                precio_actualizado=actualizar_precio()"""
             
             if nro==8:
                 fechaUltimoPrecio = input("Por favor ingrese una fecha desde la cual quiere mostrar los registros: ")
@@ -76,11 +76,11 @@ class ProgramaPrincipal:
         conexion.miConexion.commit()  #ESTO     
         conexion.cerrarConexion() # ESTO SIEMPRE LO MISMO
 
-class Monopatin:
-    def init(self,id_usuario, marca,precio=None,cantidadDisponibles=None):
-        self.id_usuario = id_usuario
-        self.marca = marca
-        self.precio = precio
+class Monopatin():
+    def __init__(self,marca,precio,cantidadDisponibles):
+        #self.id_usuario = id_usuario
+        self.marca = str(marca)
+        self.precio = float(precio)
         self.cantidadDisponibles = cantidadDisponibles
         
     def cargar_monopatin(self):
@@ -152,8 +152,8 @@ class Monopatin:
         finally:
             conexion.cerrarConexion()
 
-class Monopatin2:
-    def init(self,id_mono, modelo, marca, potencia, precio, color, fechaUltimoPrecio):
+class Monopatin2():
+    def __init__(self,id_mono, modelo, marca, potencia, precio, color, fechaUltimoPrecio):
         self.id_mono = id_mono
         self.modelo = modelo
         self.marca = marca
