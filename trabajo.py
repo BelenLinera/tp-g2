@@ -1,4 +1,7 @@
 import sqlite3
+import datetime
+from datetime import date
+
 
 class ProgramaPrincipal:
 
@@ -43,25 +46,33 @@ class ProgramaPrincipal:
                 lista_ordenada =Monopatin()
                 lista_ordenada.mostrar_productos()
             if nro ==6:
+
+                """import datetime  
+                        birthday=input("What is your B'day? (in DD/MM/YYYY) ")  
+                        birthdate=datetime.datetime.strptime(birthday,"%d/%m/%Y").date()  
+                        print("Your B'day is : "+birthdate.strftime('%d/%B/%Y'))"""
                 modelo= input("Por favor ingrese el modelo del monopatin: ")
                 marca = input("Por favor ingrese la marca del monopatin: ")
                 potencia = input("Por favor ingrese la potencia del monopatin: ")
                 precio = float(input("Por favor ingrese el precio del monopatin: "))
                 color = input("Por favor ingrese el color del monopatin: ")
-                fechaUltimoPrecio = input("Por favor ingrese la fecha del ultimo precio: ")
+                birthday=input("What is your B'day? (in DD/MM/YYYY) ")  
+                birthdate=datetime.datetime.strptime(birthday,"%d/%m/%Y").date() 
+                #fechaUltimoPrecio = input("Por favor ingrese la fecha del ultimo precio: (DD/MM/YYYY)")
+                #fechaUltimoPrecio=datetime.datetime.strptime(fechaUltimoPrecio, "%d/%m/%Y").date()
                 nuevo_monopatin2 = Monopatin2()
                 nuevo_monopatin2.modelo=modelo
                 nuevo_monopatin2.marca=marca
                 nuevo_monopatin2.potencia=potencia
                 nuevo_monopatin2.precio=precio
                 nuevo_monopatin2.color=color
-                nuevo_monopatin2.fechaUltimoPrecio=fechaUltimoPrecio
+                nuevo_monopatin2.fechaUltimoPrecio=birthdate
                 nuevo_monopatin2.cargar_monopatin2()
             if nro==7:
                 fechaUltimoPrecio = input("Por favor ingrese la fecha de hoy: ")
                 precio_actualizado=Monopatin2()
                 precio_actualizado.fechaUltimoPrecio= fechaUltimoPrecio
-                precio_actualizado=actualizar_precio()
+                precio_actualizado.actualizar_precio()
             
             if nro==8:
                 fechaAnterior = input("Por favor ingrese una fecha desde la cual quiere mostrar los registros: ")
@@ -80,7 +91,7 @@ class ProgramaPrincipal:
     def crearTablas2(self):
         conexion = Conexiones() 
         conexion.abrirConexion() 
-        conexion.miCursor.execute("CREATE TABLE IF NOT EXISTS MONOPATINES2 (id_mono INTEGER PRIMARY KEY AUTOINCREMENT, modelo  VARCHAR(30), marca VARCHAR(30), potencia VARCHAR(30), precio INTEGER,color VARCHAR(30),fechaUltimoPrecio DATETIME")  
+        conexion.miCursor.execute("CREATE TABLE IF NOT EXISTS MONOPATINES2 (id_mono INTEGER PRIMARY KEY AUTOINCREMENT, modelo VARCHAR(30), marca  VARCHAR(30),potencia VARCHAR(30), precio VARCHAR(30), color VARCHAR(30), fechaUltimoPrecio DATETIME)")
         conexion.miConexion.commit() 
         conexion.cerrarConexion()
 
@@ -237,4 +248,5 @@ class Conexiones:
             
 programa = ProgramaPrincipal()
 programa.crearTablas()
+programa.crearTablas2()
 programa.menu()
