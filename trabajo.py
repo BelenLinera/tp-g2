@@ -63,7 +63,7 @@ class ProgramaPrincipal:
                 precio_actualizado=actualizar_precio()"""
             
             if nro==8:
-                fechaUltimoPrecio = input("Por favor ingrese una fecha desde la cual quiere mostrar los registros: ")
+                fechaAnterior = input("Por favor ingrese una fecha desde la cual quiere mostrar los registros: ")
                 fechaEspecifica = Monopatin2()
                 fechaEspecifica.mostrarRegistros()
             if nro==0:
@@ -120,9 +120,7 @@ class Monopatin:
         except:
             print("Error, no se encontro el id")
         finally:
-            conexion.cerrarConexion()    
-        
-        
+            conexion.cerrarConexion()   
 
     def cargar_disponibilidad(self):
         conexion = Conexiones()
@@ -136,7 +134,6 @@ class Monopatin:
         finally:
             conexion.cerrarConexion()
         
-
     def mostrar_productos(self):
         conexion = Conexiones()
         conexion.abrirConexion()
@@ -163,7 +160,7 @@ class Monopatin2:
     def crearTablas2(self):
         conexion = Conexiones() 
         conexion.abrirConexion() 
-        conexion.miCursor.execute("DROP TABLE IF EXISTS MONOPATINES")
+        conexion.miCursor.execute("DROP TABLE IF EXISTS MONOPATINES2")
         #asi esta bien para que guarde los valores?
         conexion.miCursor.execute("CREATE TABLE MONOPATINES2 (id_mono INTEGER PRIMARY KEY AUTOINCREMENT, modelo  VARCHAR(30), marca VARCHAR(30), potencia VARCHAR(30), precio INTEGER,color VARCHAR(30),fechaUltimoPrecio DATETIME")  
         conexion.miCursor.execute("INSERT INTO MONOPATINES2(id_mono,marca,precio) SELECT  id_usuario, marca, precio where Monopatines")
@@ -220,7 +217,7 @@ class Monopatin2:
         conexion.abrirConexion()
         try:
             #como hago para comparar la fecha "anterior" con la variable fecha ultimo precio
-            conexion.miCursor.execute ("SELECT * FROM MONOPATINES2 where fechaUltimoPrecio < fechaUltimoPrecio")
+            conexion.miCursor.execute ("SELECT * FROM MONOPATINES2 where fechaUltimoPrecio < fechaAnterior")
             conexion.miConexion.commit()
             print("Los registros fueron mostrados correctamente")
         except:
