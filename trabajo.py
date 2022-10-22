@@ -1,6 +1,6 @@
 import sqlite3
 import datetime
-from datetime import date
+#from datetime import date
 
 
 class ProgramaPrincipal:
@@ -46,22 +46,22 @@ class ProgramaPrincipal:
                 lista_ordenada =Monopatin()
                 lista_ordenada.mostrar_productos()
             if nro ==6:
-
                 modelo= input("Por favor ingrese el modelo del monopatin: ")
                 marca = input("Por favor ingrese la marca del monopatin: ")
                 potencia = input("Por favor ingrese la potencia del monopatin: ")
                 precio = float(input("Por favor ingrese el precio del monopatin: "))
                 color = input("Por favor ingrese el color del monopatin: ")
-                fechaUltimoPrecio = input("Por favor ingrese la fecha del ultimo precio: (DD/MM/YYYY)")
-                fecha=datetime.datetime.strptime(fechaUltimoPrecio, "%d/%m/%Y").date()
+                fechaUltimoPrecio = input("Por favor ingrese la fecha del ultimo precio: (DD/MM/YYYY) ")
+                fechaUltimoPrecio=datetime.datetime.strptime(fechaUltimoPrecio, "%d/%m/%Y").date()
                 nuevo_monopatin2 = Monopatin2()
                 nuevo_monopatin2.modelo=modelo
                 nuevo_monopatin2.marca=marca
                 nuevo_monopatin2.potencia=potencia
                 nuevo_monopatin2.precio=precio
                 nuevo_monopatin2.color=color
-                nuevo_monopatin2.fechaUltimoPrecio=fecha
+                nuevo_monopatin2.fechaUltimoPrecio=fechaUltimoPrecio
                 nuevo_monopatin2.cargar_monopatin2()
+                print(modelo, marca, potencia, precio, color, fechaUltimoPrecio )
             if nro==7:
                 fechaUltimoPrecio = input("Por favor ingrese la fecha de hoy: ")
                 precio_actualizado=Monopatin2()
@@ -69,9 +69,11 @@ class ProgramaPrincipal:
                 precio_actualizado.actualizar_precio()
             
             if nro==8:
-                fechaAnterior = input("Por favor ingrese una fecha desde la cual quiere mostrar los registros: ")
-                fechaEspecifica = Monopatin2()
-                fechaEspecifica.mostrarRegistros()
+                fechaAnterior = input("Por favor ingrese una fecha desde la cual quiere mostrar los registros: (DD/MM/YYYY) ")
+                fechaAnterior=datetime.datetime.strptime(fechaAnterior, "%d/%m/%Y").date()
+                fecha_especifica = Monopatin2()
+                fecha_especifica.fechaUltimoPrecio = fechaAnterior
+                fecha_especifica.mostrarRegistros()
             if nro==0:
                 break
     
@@ -167,7 +169,7 @@ class Monopatin2:
         self.potencia = potencia
         self.precio = precio
         self.color = color
-        self.fechaUltimoPrecio=fechaUltimoPrecio
+        self.fechaUltimoPrecio = fechaUltimoPrecio
 
     def cargar_monopatin2(self):
         conexion = Conexiones()
