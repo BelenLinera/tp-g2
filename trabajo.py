@@ -1,6 +1,7 @@
 import sqlite3
 import datetime
-#from datetime import date
+from datetime import date
+import time
 
 
 class ProgramaPrincipal:
@@ -51,8 +52,7 @@ class ProgramaPrincipal:
                 potencia = input("Por favor ingrese la potencia del monopatin: ")
                 precio = float(input("Por favor ingrese el precio del monopatin: "))
                 color = input("Por favor ingrese el color del monopatin: ")
-                fechaUltimoPrecio = input("Por favor ingrese la fecha del ultimo precio: (DD/MM/YYYY) ")
-                fechaUltimoPrecio=datetime.datetime.strptime(fechaUltimoPrecio, "%d/%m/%Y").date()
+                fechaUltimoPrecio=time.strftime("%x %X")
                 nuevo_monopatin2 = Monopatin2()
                 nuevo_monopatin2.modelo=modelo
                 nuevo_monopatin2.marca=marca
@@ -60,20 +60,16 @@ class ProgramaPrincipal:
                 nuevo_monopatin2.precio=precio
                 nuevo_monopatin2.color=color
                 nuevo_monopatin2.fechaUltimoPrecio=fechaUltimoPrecio
-                nuevo_monopatin2.cargar_monopatin2()
-                print(modelo, marca, potencia, precio, color, fechaUltimoPrecio )
+                nuevo_monopatin2.cargar_monopatin2()    
             if nro==7:
-                fechaUltimoPrecio = input("Por favor ingrese la fecha de hoy: ")
+                fechaActual= time.strftime("%x %X")
+                datos_a_insertar=historicoPrecios()
+                datos_a_insertar.insertarDatos()
                 precio_actualizado=Monopatin2()
-                precio_actualizado.fechaUltimoPrecio= fechaUltimoPrecio
-                precio_actualizado.actualizar_precio()
-            
+                precio_actualizado.actualizar_precio(fechaActual)
             if nro==8:
-                fechaAnterior = input("Por favor ingrese una fecha desde la cual quiere mostrar los registros: (DD/MM/YYYY) ")
-                fechaAnterior=datetime.datetime.strptime(fechaAnterior, "%d/%m/%Y").date()
-                fecha_especifica = Monopatin2()
-                fecha_especifica.fechaUltimoPrecio = fechaAnterior
-                fecha_especifica.mostrarRegistros()
+                fechaAIngresar = input("Ingrese una fecha y la hora para buscar los registros con el formato: '(MM/DD/YY hh:mm:ss)': ")
+                Monopatin2.listado_fechas(fechaAIngresar)
             if nro==0:
                 break
     
@@ -89,6 +85,13 @@ class ProgramaPrincipal:
         conexion.abrirConexion() 
         conexion.miCursor.execute("CREATE TABLE IF NOT EXISTS MONOPATINES2 (id_mono INTEGER PRIMARY KEY AUTOINCREMENT, modelo VARCHAR(30), marca  VARCHAR(30),potencia VARCHAR(30), precio VARCHAR(30), color VARCHAR(30), fechaUltimoPrecio DATETIME)")
         conexion.miConexion.commit() 
+        conexion.cerrarConexion()
+    
+    def crearTablaHP(self):
+        conexion = Conexiones() 
+        conexion.abrirConexion() 
+        conexion.miCursor.execute("CREATE TABLE IF NOT EXISTS HISTORICO_PRECIOS (id_mono INTEGER PRIMARY KEY AUTOINCREMENT, modelo VARCHAR(30), marca  VARCHAR(30),potencia VARCHAR(30), precio VARCHAR(30), color VARCHAR(30), fechaUltimoPrecio DATETIME)")
+        conexion.miConexion.commit()  
         conexion.cerrarConexion()
 
 class Monopatin:
@@ -120,9 +123,7 @@ class Monopatin:
         except:
             print('Error al actualizar un monopatin')
         finally:
-            conexion.cerrarConexion()
-
-       
+            conexion.cerrarConexion()  
 
     def cargar_disponibilidad(self):
         conexion = Conexiones()
@@ -150,17 +151,16 @@ class Monopatin:
             conexion.cerrarConexion()
 
 def eliminar_monopatin(id_usuario):
-        conexion = Conexiones()
-        conexion.abrirConexion()
-        try: 
-            
-            conexion.miCursor.execute("DELETE FROM MONOPATINES where id_usuario='{}'".format(id_usuario)) 
-            conexion.miConexion.commit()
-            print("Se ha eliminado correctamente")
-        except:
-            print("Error, no se encontro el id")
-        finally:
-            conexion.cerrarConexion()
+    conexion = Conexiones()
+    conexion.abrirConexion()
+    try: 
+        conexion.miCursor.execute("DELETE FROM MONOPATINES where id_usuario='{}'".format(id_usuario)) 
+        conexion.miConexion.commit()
+        print("Se ha eliminado correctamente")
+    except:
+        print("Error, no se encontro el id")
+    finally:
+        conexion.cerrarConexion()
 
 class Monopatin2:
     def init(self,modelo,marca,potencia,precio,color,fechaUltimoPrecio):
@@ -175,62 +175,59 @@ class Monopatin2:
         conexion = Conexiones()
         conexion.abrirConexion()
         try:
-            conexion.miCursor.execute("INSERT INTO MONOPATINES2 (modelo,marca,potencia,precio,color,fehaUltimoPrecio) VALUES('{}','{}','{}','{}','{}','{}')".format(self.modelo, self.marca, self.potencia, self.precio, self.color, self.fechaUltimoPrecio))
+            conexion.miCursor.execute("INSERT INTO MONOPATINES2 (modelo,marca,potencia,precio,color,fechaUltimoPrecio) VALUES('{}','{}','{}','{}','{}','{}')".format(self.modelo, self.marca, self.potencia, self.precio, self.color, self.fechaUltimoPrecio))
             conexion.miConexion.commit()
             print("Monopatin cargado exitosamente")
             
         except:
             print("Error al agregar un monopatin")
         finally:
-            conexion.cerrarConexion()
+            conexion.cerrarConexion() 
 
-    def crearTablaHistoricoPrecio(self):
-        conexion = Conexiones() 
-        conexion.abrirConexion() 
-        conexion.miCursor.execute("DROP TABLE IF EXISTS MONOPATINES2")
-        conexion.miCursor.execute("CREATE TABLE HISTORICO_PRECIOS (id_hist, historico_precios)")  
-        conexion.miCursor.execute("INSERT INTO HISTORICO_PRECIOS(id_mono,precio) SELECT  id_hist, historico_precio where MONOPATINES2")  
-        conexion.miConexion.commit()  
-        conexion.cerrarConexion() 
-
-    def crearTablasHistoricoMono(self):
-        conexion = Conexiones() 
-        conexion.abrirConexion() 
-        conexion.miCursor.execute("DROP TABLE IF EXISTS MONOPATINES2")
-        conexion.miCursor.execute("CREATE TABLE HISTORICO_MONO (id_mono INTEGER PRIMARY KEY AUTOINCREMENT, modelo VARCHAR(30), marca VARCHAR(30), potencia VARCHAR(30), precio INTEGER, color VARCHAR(30),fechaUltimoPrecio DATETIME")  
-        conexion.miCursor.execute("INSERT INTO HISTORICO_MONO(id_mono,modelo,marca,potencia,precio,color,fechaUltimoPrecio) SELECT  id_mono,modelo,marca,potencia,precio,color,fechaUltimoPrecio where MONOPATINES2")
-        conexion.miConexion.commit() 
-        conexion.cerrarConexion()
-
-    def actualizar_precio(self):
+    def actualizar_precio(self,fechaActual):
         conexion = Conexiones()
         conexion.abrirConexion()
         try:
-            #esta bien poner asi lo de precio. Y si esta bien agregar self.precio. si necesita un * para q modifique a todos
-            #como hacemos para que modifique la fecha si al principio le decimos que ingrese la fecha de hoy
-            #si arriba le pedimos que lo ingrese en una variable nueva y lo modificamos abajo
-            conexion.miCursor.execute ("UPDATE MONOPATINES2 SET precio = (precio * 1.23) ")            
+            conexion.miCursor.execute ("UPDATE MONOPATINES2 SET precio = (precio * 1.23)")   
+            
+            conexion.miCursor.execute ("UPDATE MONOPATINES2 SET fechaUltimoPrecio = '{}'".format(fechaActual))            
             conexion.miConexion.commit()
             print("Precio actualizado")
         except:
             print('Error al actualizar los precios')
         finally:
             conexion.cerrarConexion()
-        
-    def mostrarRegistros(self):
-        conexion = Conexiones() 
+
+    @classmethod
+    def listado_fechas(cls,fechaAIngresar):
+        conexion = Conexiones()
         conexion.abrirConexion()
         try:
-            #como hago para comparar la fecha "anterior" con la variable fecha ultimo precio
-            conexion.miCursor.execute ("SELECT * FROM MONOPATINES2 where fechaUltimoPrecio < fechaAnterior")
-            conexion.miConexion.commit()
-            print("Los registros fueron mostrados correctamente")
+            conexion.miCursor.execute("SELECT * FROM MONOPATINES2 WHERE fechaUltimoPrecio <= '{}'".format(fechaAIngresar))
+            monopatines = conexion.miCursor.fetchall()
+            for monopatin in monopatines:
+                id,modelo,marca,potencia,precio,color,fechaUltimoPrecio = monopatin
+                print("El monopatin con ID: "+str(id)+" marca: "+str(marca)+ " modelo: "+str(modelo)+ " potencia: "+str(potencia)+" precio: "+str(precio)+" color "+str(color)+" fecha: "+str(fechaUltimoPrecio))
         except:
-             print('Error al mostrar los registros anteriores a la fecha ingresada')
+            print("Error no se han encontrado registros anteriores a esa fecha")
         finally:
             conexion.cerrarConexion()
 
+class historicoPrecios:
+    def init(self,modelo,marca,potencia,precio,color,fechaUltimoPrecio):
+        self.modelo = modelo
+        self.marca = marca
+        self.potencia = potencia
+        self.precio = precio
+        self.color = color
+        self.fechaUltimoPrecio = fechaUltimoPrecio
         
+    def insertarDatos(self):
+        conexion = Conexiones() 
+        conexion.abrirConexion() 
+        conexion.miCursor.execute("INSERT INTO HISTORICO_PRECIOS (modelo,marca,potencia,precio,color,fechaUltimoPrecio) SELECT modelo,marca,potencia,precio,color,fechaUltimoPrecio FROM MONOPATINES2")  
+        conexion.miConexion.commit()  
+        conexion.cerrarConexion() 
 
 class Conexiones:
     def abrirConexion(self):
@@ -244,4 +241,5 @@ class Conexiones:
 programa = ProgramaPrincipal()
 programa.crearTablas()
 programa.crearTablas2()
+programa.crearTablaHP()
 programa.menu()
